@@ -55,23 +55,72 @@ int main(int argc, char *argv[]) {
 	char *outputFileName = NULL;
 	
 	// Verify Parameters and Assign Them
-	for (int i = 1; i < argc; i++) { // Skip first one because it is program's name
-		if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--active-bits") == 0) {
-			activeBits.byte = strtoul(argv[i+1], NULL, 2);
-		} else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--decode") == 0) {
-			isEncoding = 0;
-		} else if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--encode") == 0) {
-			isEncoding = 1;
-		} else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--target") == 0) {
-			targetFileName = argv[i+1];
-		} else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--secret") == 0) {
-			secretFileName = argv[i+1];
-		} else if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--output") == 0) {
-			outputFileName = argv[i+1];
-		} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+	{ // In Scope to prevent access to unnecessary and temporary variables from other places in the function
+		uByte mandatoryCheck;
+		mandatoryCheck.byte = 0;
+		/*
+		 * bit0: -b
+		 * bit1: -e, -d
+		 * bit2: -t
+		 * bit3: -s
+		 * bit4: -o
+		*/
+		for (int i = 1; i < argc; i++) { // Skip first one because it is program's name
+			if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--active-bits") == 0) {
+				char *endPointer = NULL;
+				activeBits.byte = strtoul(argv[i+1], &endPointer, 2);
+				if (endPointer == argv[i+1]) showError("-b is invalid! Make sure you enter a byte as a binary number. I.E: 00000101");
+				setBit(&mandatoryCheck, 0, 1, 0);
+			} else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--decode") == 0) {
+				isEncoding = 0;
+				setBit(&mandatoryCheck, 1, 1, 0);
+			} else if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--encode") == 0) {
+				isEncoding = 1;
+				setBit(&mandatoryCheck, 1, 1, 0);
+			} else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--target") == 0) {
+				targetFileName = argv[i+1];
+				setBit(&mandatoryCheck, 2, 1, 0);
+			} else if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--secret") == 0) {
+				secretFileName = argv[i+1];
+				setBit(&mandatoryCheck, 3, 1, 0);
+			} else if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "--output") == 0) {
+				outputFileName = argv[i+1];
+				setBit(&mandatoryCheck, 4, 1, 0);
+			} else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+				showHelp();
+			} else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
+				showVersion();
+			}
+		}unsigned char requiredArguments = 4;
+		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1) requiredArguments = 5;
+		if (countBits(mandatoryCheck) < requiredArguments) {
+			for (unsigned char i = 0; i < requiredArguments; i++) {
+				if (getBit(mandatoryCheck, i, 0) == 0) {
+					signed char argument[5] = {'-', 0, 0, 0, 0};
+					switch (i) {
+						case 0:
+							argument[1] = 'b';
+							break;
+						case 1:
+							argument[1] = 'e';
+							argument[2] = '/';
+							argument[3] = '-';
+							argument[4] = 'd';
+							break;
+						case 2:
+							argument[1] = 't';
+							break;
+						case 3:
+							argument[1] = 's';
+							break;
+						case 4:
+							argument[1] = 'o';
+							break;
+					}
+					printf("Missing argument %s.\n", argument);
+				}
+			}
 			showHelp();
-		} else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
-			showVersion();
 		}
 	}
 	
