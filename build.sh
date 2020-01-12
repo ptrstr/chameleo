@@ -9,5 +9,5 @@ touch .keep
 cmake ..
 make
 
-# Binary will be Octoparser, but be sure to make this cross-project
-su -c "mv ./Octoparser /usr/bin/stegano && sign /usr/bin/stegano"
+# Binary will be stegano, but be sure to make this cross-project
+su -c "mv ./stegano /usr/bin/stegano && sign /usr/bin/stegano"
