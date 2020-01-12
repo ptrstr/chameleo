@@ -91,7 +91,8 @@ int main(int argc, char *argv[]) {
 			} else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
 				showVersion();
 			}
-		}unsigned char requiredArguments = 4;
+		}
+		unsigned char requiredArguments = 4;
 		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1) requiredArguments = 5;
 		if (countBits(mandatoryCheck) < requiredArguments) {
 			for (unsigned char i = 0; i < requiredArguments; i++) {
