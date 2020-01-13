@@ -1,5 +1,7 @@
 typedef enum {
+	NULL,
 	WAV
-} format;
+} FORMAT;
 
-format detectFormat(unsigned char *buffer, unsigned long bufferSize);
+FORMAT detectFormat(unsigned char *buffer, unsigned long bufferSize);
+unsigned long 
