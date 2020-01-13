@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "uByte.h"
+#include "formats/formats.h"
 #define VERSION "0.1"
-
 
 
 #define showError(errorMessage) \
