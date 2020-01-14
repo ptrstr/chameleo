@@ -2,7 +2,8 @@
 
 typedef enum {
 	NULLFORMAT,
-	WAV
+	WAV,
+	BITMAP
 } FORMAT;
 
 FORMAT getFormat(unsigned char *buffer, unsigned long bufferSize);

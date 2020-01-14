@@ -4,3 +4,6 @@
 # build stuff
 build/*
 !build/.keep
+
+# documentation
+doc/*
