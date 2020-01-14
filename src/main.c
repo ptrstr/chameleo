@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "uByte.h"
+#include "uByte/uByte.h"
 #include "formats/formats.h"
+#include "steganographer/steganographer.h"
 #define VERSION "0.1"
 
 
@@ -12,7 +13,7 @@
 	printf("" \
 			"Usage: %s [OPTIONS]\n" \
 			"All-In-One Steganography Tool\n" \
-			"\nMANDATORY ARGUMENTS:\n" \
+			"\nMandatory Arguments:\n" \
 			"    -b, --active-bits    Set bits to overwrite\n" \
 			"    -e, --encode         Set mode to ENCODING\n" \
 			"    -d, --decode         Set mode to DECODING\n" \
@@ -24,7 +25,7 @@
 			"                           DECODING: This will be used as the output file\n" \
 			"    -o, --output         Set output file. ONLY mandatory for ENCODING\n" \
 			"                           ENCODING: This file will be used to output the steganographed target\n" \
-			"\nOPTIONAL ARGUMENTS:\n" \
+			"\nOptional Arguments:\n" \
 			"    -h, --help           Print this message and exit\n" \
 			"    -v, --version        Print version information and other information and exit\n" \
 			"On errors, the help message or the version information, the program will exit with exit code 1.\n" \
@@ -34,6 +35,10 @@
 	printf("" \
 			"stegano " VERSION "\n" \
 			"Copyright (C) 2020 ptrstr.\n" \
+			"\nSupported Formats:\n" \
+			"    WAVE audio file (.wav)\n" \
+			"    JFIF image file (.jpg)\n" \
+			"    BMP image file (.bmp)\n" \
 			); goto errorfree;
 int main(int argc, char *argv[]) {
 	// Variable Initialization
@@ -71,11 +76,11 @@ int main(int argc, char *argv[]) {
 				activeBits.byte = strtoul(argv[i+1], &endPointer, 2);
 				if (endPointer == argv[i+1]) showError("-b is invalid! Make sure you enter a byte as a binary number. I.E: 00000101");
 				setBit(&mandatoryCheck, 0, 1, 0);
-			} else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--decode") == 0) {
-				isEncoding = 0;
-				setBit(&mandatoryCheck, 1, 1, 0);
 			} else if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--encode") == 0) {
 				isEncoding = 1;
+				setBit(&mandatoryCheck, 1, 1, 0);
+			} else if (strcmp(argv[i], "-d") == 0 || strcmp(argv[i], "--decode") == 0) {
+				isEncoding = 0;
 				setBit(&mandatoryCheck, 1, 1, 0);
 			} else if (strcmp(argv[i], "-t") == 0 || strcmp(argv[i], "--target") == 0) {
 				targetFileName = argv[i+1];
@@ -140,11 +145,40 @@ int main(int argc, char *argv[]) {
 	fread(targetBuffer, targetSize, 1, targetFile);
 	fclose(targetFile);
 	
+	// Get file format
+	FORMAT format = getFormat(targetBuffer, targetSize);
+	if (format == NULLFORMAT) showError("The target filetype is unrecognized! See the -v argument to show all current supported formats.");
+	
+	// Get file offsets for steganography
+	unsigned long *offsets = getFormatOffsets(targetBuffer, targetSize, format);
+	if (!offsets) showError("An error occured while reading the file! Make sure enough memory is free on your system and that the file is not corrupted.");
+	
 	// Steganographer starts here
+	if (isEncoding == 1) {
+		outputBuffer = (unsigned char*)malloc(targetSize * sizeof(unsigned char));
+		if (!outputBuffer) showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
+		unsigned char status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, activeBits);
+		if (status == 1) showError("File size mismatch! Secret file is can't fit in target with this configuration!");
+		
+		outputFile = fopen(outputFileName, "w");
+		if (!outputFile) showError("Output file could not be opened for writing! Make sure you have permissions.");
+		// Do this to cancel any \0 errors
+		for (unsigned long i = 0; i < targetSize; i++) fputc(outputBuffer[i], outputFile);
+		fclose(outputFile);
+	} else if (isEncoding == 0) {
+		
+	} else {
+		showError("[visible confusion]");
+	}
+	
+	free(targetBuffer);
+	free(secretBuffer);
+	free(outputBuffer);
+	free(offsets);
 	
 	return 0;
 	
-	// This part will never be called unless a goto is specified. It is used to free buffers and other allocated variables
+	// This part will never be called unless a goto is specified. It is used to free buffers and other allocated variables (safe panic)
 	errorfree:;
 	if (targetBuffer)
 		free(targetBuffer);
@@ -158,5 +192,7 @@ int main(int argc, char *argv[]) {
 		free(outputBuffer);
 	if (outputFile)
 		fclose(outputFile);
+	if (offsets)
+		free(offsets);
 	return 1;
 }

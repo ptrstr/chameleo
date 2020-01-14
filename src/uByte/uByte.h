@@ -1,3 +1,5 @@
+#pragma once
+
 typedef union {
 	struct {
 		unsigned char bit0 : 1;

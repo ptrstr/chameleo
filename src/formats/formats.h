@@ -1,7 +1,9 @@
+#pragma once
+
 typedef enum {
-	NULL,
+	NULLFORMAT,
 	WAV
 } FORMAT;
 
-FORMAT detectFormat(unsigned char *buffer, unsigned long bufferSize);
-unsigned long 
+FORMAT getFormat(unsigned char *buffer, unsigned long bufferSize);
+unsigned long *getFormatOffsets(unsigned char *buffer, unsigned long bufferSize, FORMAT format);

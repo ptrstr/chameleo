@@ -6,6 +6,6 @@ endif(APPLE AND UNIX)
 
 project(stegano)
 
-file(GLOB SOURCES "src/*.c" "src/formats/*.c" "src/formats/*/*.c")
+file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 
 add_executable(stegano ${SOURCES})
