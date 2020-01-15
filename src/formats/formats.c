@@ -4,23 +4,29 @@
 #include "wav/wav.h"
 #include "bitmap/bitmap.h"
 
-FORMAT getFormat(unsigned char *buffer, unsigned long bufferSize) {
+FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (detectWAV(buffer, bufferSize)) return WAV;
 	if (detectBitmap(buffer, bufferSize)) return BITMAP;
 	return NULLFORMAT;
 }
 
-unsigned long *getFormatOffsets(unsigned char *buffer, unsigned long bufferSize, FORMAT format) {
-	unsigned long *offsets = NULL;
-	
+unsigned long long int *getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format) {
+	unsigned long long int *offsets = (unsigned long long int*)calloc(2, sizeof(unsigned long long int));
+	if (!offsets) return NULL;
+
 	switch (format) {
 		case WAV:
-			offsets = getWAVOffsets(buffer, bufferSize);
+			getWAVOffsets(offsets, buffer, bufferSize);
+			break;
 		case BITMAP:
-			offsets = getBitmapOffsets(buffer, bufferSize);
+			getBitmapOffsets(offsets, buffer, bufferSize);
+			break;
+		case NULLFORMAT: // To avoid warning
+			offsets = NULL;
+			break;
 	}
-	
+
 	if (!offsets) return NULL;
-	
+
 	return offsets;
 }

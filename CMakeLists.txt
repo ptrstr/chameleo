@@ -6,6 +6,8 @@ endif(APPLE AND UNIX)
 
 project(stegano)
 
+SET(CMAKE_CC_FLAGS "-Wall")
+
 file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 
 add_executable(stegano ${SOURCES})

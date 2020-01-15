@@ -6,5 +6,5 @@ typedef enum {
 	BITMAP
 } FORMAT;
 
-FORMAT getFormat(unsigned char *buffer, unsigned long bufferSize);
-unsigned long *getFormatOffsets(unsigned char *buffer, unsigned long bufferSize, FORMAT format);
+FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize);
+unsigned long long int *getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format);
