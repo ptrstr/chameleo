@@ -19,9 +19,17 @@ unsigned char detectBitmap(unsigned char *buffer, unsigned long long int bufferS
 	return 1;
 }
 
-void getBitmapOffsets(unsigned long long int *offsets, unsigned char *buffer, unsigned long long int bufferSize) {
+void getBitmapOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
+	(*offsetsSize)++;
+	*offsets = (unsigned long long int**)calloc(sizeof(unsigned long long int*), *offsetsSize);
+	if (!offsets)
+		return;
+	(*offsets)[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int*), 2);
+	if (!offsets[0])
+		return;
+	
 	// Extract pixel data start from header
-	memcpy(&offsets[0], buffer + 0x0A, 4);
+	memcpy(&((*offsets)[0][0]), buffer + 0x0A, 4);
 
 	// Get end offset
 	// Get image width and height
@@ -38,7 +46,7 @@ void getBitmapOffsets(unsigned long long int *offsets, unsigned char *buffer, un
 
 	// Get end offset
 	unsigned long long int pixelDataBytes = pixels * (bitsPerPixel / 8);
-	offsets[1] = offsets[0] + pixelDataBytes;
+	(*offsets)[0][1] = (*offsets)[0][0] + pixelDataBytes;
 
 	return;
 }

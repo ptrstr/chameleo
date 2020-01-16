@@ -46,7 +46,8 @@
 
 int main(int argc, char *argv[]) {
 	// Variable Initialization
-	uByte activeBits;
+	uByte *activeBits;
+	unsigned long long int activeBitsSize = 0;
 	unsigned char isEncoding = 2;
 
 	unsigned char *targetBuffer = NULL;
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
 	FILE *outputFile = NULL;
 	char *outputFileName = NULL;
 
-	unsigned long long int *offsets = NULL;
+	unsigned long long int *(*offsets) = NULL;
+	unsigned long long int offsetsSize = 0;
 
 	unsigned char isUsingHeader = 0;
 
@@ -81,7 +83,14 @@ int main(int argc, char *argv[]) {
 		for (int i = 1; i < argc; i++) { // Skip first one because it is program's name
 			if (strcmp(argv[i], "-b") == 0 || strcmp(argv[i], "--active-bits") == 0) {
 				if (i + 1 >= argc) break;
-				activeBits.byte = strtoul(argv[i+1], NULL, 2);
+				if (strlen(argv[i+1]) % 8 != 0)
+					showError("Bit pattern invalid! Make sure you are entering full bytes!");
+				activeBits = (uByte*)calloc(strlen(argv[i+1]) / 8, sizeof(uByte));
+				activeBitsSize = strlen(argv[i+1]) / 8;
+				for (unsigned long long int j = 0; j < strlen(argv[j+1]); j += 8) {
+					unsigned char currentActiveBits[8] = {argv[i+1][j], argv[i+1][j+1], argv[i+1][j+2], argv[i+1][j+3], argv[i+1][j+4], argv[i+1][j+5], argv[i+1][j+6], argv[i+1][j+7]};
+					activeBits[j/8].byte = strtoul((char*)currentActiveBits, NULL, 2);
+				}
 				setBit(&mandatoryCheck, 0, 1, 0);
 			} else if (strcmp(argv[i], "-e") == 0 || strcmp(argv[i], "--encode") == 0) {
 				isEncoding = 1;
@@ -166,7 +175,7 @@ int main(int argc, char *argv[]) {
 		showError("The target filetype is unrecognized! See the -v argument to show all current supported formats.");
 
 	// Get file offsets for steganography
-	offsets = getFormatOffsets(targetBuffer, targetSize, format);
+	getFormatOffsets(targetBuffer, targetSize, format, &offsets, &offsetsSize);
 	if (!offsets)
 		showError("An error occured while reading the file! Make sure enough memory is free on your system and that the file is not corrupted.");
 
@@ -211,7 +220,7 @@ int main(int argc, char *argv[]) {
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Steganograph!
-		unsigned char status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, activeBits);
+		unsigned char status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 1)
 			showError("File size mismatch! Secret file can't fit in target with this configuration!");
 		if (status == 2)
@@ -228,7 +237,7 @@ int main(int argc, char *argv[]) {
 			unsigned char *secretChunkSize = (unsigned char*)calloc(sizeof(unsigned long long int), 1);
 			if (!secretChunkSize)
 				showError("Secret chunk size buffer could not be allocated! Make sure enough memory is free on your system.");
-			unsigned char status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(unsigned long long int), offsets, activeBits);
+			unsigned char status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(unsigned long long int), offsets, offsetsSize, activeBits, activeBitsSize);
 			if (status == 2)
 				showError("An unhandled error happened.");
 			memcpy(&secretSize, secretChunkSize, sizeof(unsigned long long int));
@@ -241,7 +250,7 @@ int main(int argc, char *argv[]) {
 
 		// Desteganograph!
 
-		unsigned char status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, activeBits);
+		unsigned char status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 2)
 			showError("An unhandled error happened.");
 
@@ -263,6 +272,8 @@ int main(int argc, char *argv[]) {
 	free(targetBuffer);
 	free(secretBuffer);
 	free(outputBuffer);
+	for (unsigned long long int i = 0; i < offsetsSize; i++)
+		free(offsets[i]);
 	free(offsets);
 
 	return 0;

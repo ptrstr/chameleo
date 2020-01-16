@@ -2,9 +2,10 @@
 
 typedef enum {
 	NULLFORMAT,
-	WAV,
-	BITMAP
+	WAVE,
+	BITMAP,
+	JFIF,
 } FORMAT;
 
 FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize);
-unsigned long long int *getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format);
+void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize);

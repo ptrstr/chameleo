@@ -1,32 +1,31 @@
 #include "formats.h"
 #include <stdlib.h>
 #include <string.h>
-#include "wav/wav.h"
+#include "wave/wave.h"
 #include "bitmap/bitmap.h"
+#include "jfif/jfif.h"
 
 FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize) {
-	if (detectWAV(buffer, bufferSize)) return WAV;
+	if (detectWAVE(buffer, bufferSize)) return WAVE;
 	if (detectBitmap(buffer, bufferSize)) return BITMAP;
+	if (detectJFIF(buffer, bufferSize)) return JFIF;
 	return NULLFORMAT;
 }
 
-unsigned long long int *getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format) {
-	unsigned long long int *offsets = (unsigned long long int*)calloc(2, sizeof(unsigned long long int));
-	if (!offsets) return NULL;
-
+void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
 	switch (format) {
-		case WAV:
-			getWAVOffsets(offsets, buffer, bufferSize);
+		case WAVE:
+			getWAVEOffsets(buffer, bufferSize, offsets, offsetsSize);
 			break;
 		case BITMAP:
-			getBitmapOffsets(offsets, buffer, bufferSize);
+			getBitmapOffsets(buffer, bufferSize, offsets, offsetsSize);
+			break;
+		case JFIF:
+			getJFIFOffsets(buffer, bufferSize, offsets, offsetsSize);
 			break;
 		case NULLFORMAT: // To avoid warning
-			offsets = NULL;
 			break;
 	}
 
-	if (!offsets) return NULL;
-
-	return offsets;
+	return;
 }
