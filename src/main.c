@@ -29,6 +29,8 @@
 			"\nOptional Arguments:\n" \
 			"    -h, --help           Print this message and exit\n" \
 			"    -v, --version        Print version information and other information and exit\n" \
+			"    --size-header        Will add a header to the steganographed data indicating the size of the data.\n" \
+			"                         With this argument the -s argument can be suppressed in DECODING" \
 			"On errors, the help message or the version information, the program will exit with exit code 1.\n" \
 			"Otherwise it will return 0.\n" \
 			, argv[0]); goto errorfree; }
@@ -62,6 +64,8 @@ int main(int argc, char *argv[]) {
 	char *outputFileName = NULL;
 
 	unsigned long long int *offsets = NULL;
+
+	unsigned char isUsingHeader = 0;
 
 	// Verify Parameters and Assign Them
 	{ // In Scope to prevent access to unnecessary and temporary variables from other places in the function
@@ -102,8 +106,13 @@ int main(int argc, char *argv[]) {
 				showHelp();
 			} else if (strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--version") == 0) {
 				showVersion();
+			} else if (strcmp(argv[i], "--size-header") == 0) {
+				isUsingHeader = 1;
 			}
 		}
+
+		if (isUsingHeader && isEncoding == 0) setBit(&mandatoryCheck, 3, 1, 0);
+
 		unsigned char requiredArguments = 4;
 		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1) requiredArguments = 5;
 		if (countBits(mandatoryCheck) < requiredArguments || isEncoding == 2) {
@@ -164,7 +173,7 @@ int main(int argc, char *argv[]) {
 	outputFile = fopen(outputFileName, "w");
 	if (!outputFile)
 		showError("Output file could not be opened for writing! Make sure you have permissions.");
-	
+
 	// Steganographer starts here
 	if (isEncoding == 1) {
 		// Open secret file for reading
@@ -180,16 +189,31 @@ int main(int argc, char *argv[]) {
 		fread(secretBuffer, secretSize, 1, secretFile);
 		fclose(secretFile);
 		secretFile = NULL;
-		
+
+		// Add header if necessary
+		if (isUsingHeader) {
+			unsigned char *secretBufferBackup = (unsigned char*)calloc(secretSize, 1);
+			if (!secretBufferBackup)
+				showError("Secret buffer backup could not be allocated! Make sure enough memory is free on your system.");
+			memcpy(secretBufferBackup, secretBuffer, secretSize);
+			secretBuffer = (unsigned char*)realloc(secretBuffer, secretSize + sizeof(unsigned long long int));
+			if (!secretBuffer)
+				showError("Secret buffer could not be reallocated! Make sure enough memory is free on your system.");
+			secretSize += sizeof(unsigned long long int);
+			memcpy(secretBuffer, &secretSize, sizeof(unsigned long long int));
+			memcpy(secretBuffer + sizeof(unsigned long long int), secretBufferBackup, secretSize - sizeof(unsigned long long int));
+			free(secretBufferBackup);
+		}
+
 		// Allocate output
 		outputBuffer = (unsigned char*)calloc(targetSize, 1);
 		if (!outputBuffer)
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
-		
+
 		// Steganograph!
 		unsigned char status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, activeBits);
 		if (status == 1)
-			showError("File size mismatch! Secret file is can't fit in target with this configuration!");
+			showError("File size mismatch! Secret file can't fit in target with this configuration!");
 		if (status == 2)
 			showError("An unhandled error happened.");
 
@@ -199,12 +223,24 @@ int main(int argc, char *argv[]) {
 		for (unsigned long long int i = 0; i < targetSize; i++)
 			fputc(outputBuffer[i], outputFile);
 	} else if (isEncoding == 0) {
+		// Get size from header if present
+		if (isUsingHeader) {
+			unsigned char *secretChunkSize = (unsigned char*)calloc(sizeof(unsigned long long int), 1);
+			if (!secretChunkSize)
+				showError("Secret chunk size buffer could not be allocated! Make sure enough memory is free on your system.");
+			unsigned char status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(unsigned long long int), offsets, activeBits);
+			if (status == 2)
+				showError("An unhandled error happened.");
+			memcpy(&secretSize, secretChunkSize, sizeof(unsigned long long int));
+		}
+
 		// Allocate output
 		outputBuffer = (unsigned char*)calloc(secretSize, 1);
 		if (!outputBuffer)
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
-		
+
 		// Desteganograph!
+
 		unsigned char status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, activeBits);
 		if (status == 2)
 			showError("An unhandled error happened.");
@@ -212,12 +248,15 @@ int main(int argc, char *argv[]) {
 		printf("Successfully desteganographed %lld bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
-		for (unsigned long long int i = 0; i < secretSize; i++)
+		unsigned long long int beginningOffset = 0;
+		if (isUsingHeader)
+			beginningOffset = sizeof(unsigned long long int);
+		for (unsigned long long int i = beginningOffset; i < secretSize; i++)
 			fputc(outputBuffer[i], outputFile);
 	} else {
 		showError("[visible confusion]");
 	}
-	
+
 	fclose(outputFile);
 	outputFile = NULL;
 
