@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 unsigned char detectJFIF(unsigned char *buffer, unsigned long long int bufferSize) {
-	return 1;
+	return 0;
 }
 
 void getJFIFOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {

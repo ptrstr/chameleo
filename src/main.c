@@ -226,6 +226,9 @@ int main(int argc, char *argv[]) {
 		if (status == 2)
 			showError("An unhandled error happened.");
 
+		// Finish off any exceptions
+		endFormatBuffer(&outputBuffer, targetSize, format, offsets, offsetsSize);
+
 		printf("Successfully steganographed %lld bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
