@@ -178,6 +178,9 @@ int main(int argc, char *argv[]) {
 	getFormatOffsets(targetBuffer, targetSize, format, &offsets, &offsetsSize);
 	if (!offsets)
 		showError("An error occured while reading the file! Make sure enough memory is free on your system and that the file is not corrupted.");
+	
+	// Prepare buffer for exceptions
+	startFormatBuffer(&targetBuffer, targetSize, format, offsets, offsetsSize);
 
 	outputFile = fopen(outputFileName, "w");
 	if (!outputFile)

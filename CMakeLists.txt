@@ -6,7 +6,7 @@ endif(APPLE AND UNIX)
 
 project(stegano)
 
-SET(CMAKE_CC_FLAGS "-Wall")
+SET(CMAKE_C_FLAGS "-Wall -lz -wunused-command-line-argument")
 
 file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 

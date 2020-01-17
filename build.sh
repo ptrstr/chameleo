@@ -11,5 +11,5 @@ make
 
 # Binary will be stegano, but be sure to make this cross-project
 if [ "$(uname -sp)" == "Darwin arm64" ]; then
-  su -c "mv ./stegano /usr/bin/stegano && sign /usr/bin/stegano"
+  su -c "cp ./stegano /usr/bin/stegano && sign /usr/bin/stegano"
 fi

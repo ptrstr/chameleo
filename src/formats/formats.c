@@ -35,6 +35,24 @@ void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 	return;
 }
 
+void startFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+	switch (format) {
+		case WAVE:
+			break;
+		case BITMAP:
+			break;
+		case JFIF:
+			break;
+		case PNG:
+			startPNGBuffer(buffer, bufferSize, offsets, offsetsSize);
+			break;
+		case NULLFORMAT: // To avoid warning
+			break;
+	}
+
+	return;
+}
+
 void endFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
 	switch (format) {
 		case WAVE:

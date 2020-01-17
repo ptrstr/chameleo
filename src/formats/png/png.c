@@ -1,6 +1,8 @@
 #include "png.h"
 #include <stdlib.h>
 #include <string.h>
+#include "../../uByte/uByte.h"
+#include <zlib.h>
 
 unsigned char detectPNG(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (buffer[0] != 0x89 ||
@@ -26,16 +28,59 @@ void getPNGOffsets(unsigned char *buffer, unsigned long long int bufferSize, uns
 				return;
 			unsigned int IDATChunkSize = 0;
 			memcpy(&IDATChunkSize, buffer + i - 4, 4);
-			(*offsets)[*offsetsSize - 1][0] = i + 4;
+			{
+				uByte endianness;
+				endianness.byte = 1;
+				if (endianness.bits.bit7 != 1) {
+					unsigned int IDATChunkSizeBigEndian = IDATChunkSize;
+					IDATChunkSize = ((IDATChunkSizeBigEndian& 0x000000ff) << 24u) | ((IDATChunkSizeBigEndian& 0x0000ff00) << 8u) | ((IDATChunkSizeBigEndian& 0x00ff0000) >> 8u) | ((IDATChunkSizeBigEndian& 0xff000000) >> 24u);
+				}
+			}
+			(*offsets)[*offsetsSize - 1][0] = i + 6;
 			(*offsets)[*offsetsSize - 1][1] = i + 4 + IDATChunkSize;
+		}
+	}
+}
+/*
+unsigned int crc32(unsigned int crc, unsigned char *buffer, unsigned int hashSize) {
+	unsigned int table[256];
+	unsigned int rem;
+	unsigned char octet;
+	int i, j;
+	unsigned char *p, *q;
+
+	// Calculate CRC table
+	for (i = 0; i < 256; i++) {
+		rem = i;
+		for (j = 0; j < 8; j++) {
+			if (rem & 1) {
+				rem >>= 1;
+				rem ^= 0xedb88320;
+			} else
+				rem >>= 1;
+		}
+		table[i] = rem;
+	}
+ 
+	crc = ~crc;
+	q = buffer + hashSize;
+	for (p = buffer; p < q; p++) {
+		crc = (crc >> 8) ^ table[(crc & 0xff) ^ (*p)];
+	}
+	return ~crc;
+}*/
+
+void startPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+	for (unsigned long long int i = 0; i < offsetsSize; i++) {
+		for (unsigned long long int offset = offsets[i][0]; offset < offsets[i][1]; offset++) {
+			
 		}
 	}
 }
 
 void endPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
 	for (unsigned long long int i = 0; i < offsetsSize; i++) {
-		unsigned int hash = crc32(0, (const char*)((*buffer) + offsets[i][0] - 4), offsets[i][1] - offsets[i][0] + 4);
-		exit(0);
+		unsigned int hash = crc32(0, (*buffer) + offsets[i][0] - 4, offsets[i][1] - offsets[i][0] + 4);
 		memcpy((*buffer) + offsets[i][1] - offsets[i][0], &hash, 4);
 	}
 }
