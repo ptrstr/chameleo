@@ -3,13 +3,13 @@
 #include <string.h>
 #include "wave/wave.h"
 #include "bitmap/bitmap.h"
-#include "jfif/jfif.h"
+#include "jpeg/jpeg.h"
 #include "png/png.h"
 
 FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (detectWAVE(buffer, bufferSize)) return WAVE;
 	if (detectBitmap(buffer, bufferSize)) return BITMAP;
-	if (detectJFIF(buffer, bufferSize)) return JFIF;
+	if (detectJPEG(buffer, bufferSize)) return JPEG;
 	if (detectPNG(buffer, bufferSize)) return PNG;
 	return NULLFORMAT;
 }
@@ -22,8 +22,8 @@ void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 		case BITMAP:
 			getBitmapOffsets(buffer, bufferSize, offsets, offsetsSize);
 			break;
-		case JFIF:
-			getJFIFOffsets(buffer, bufferSize, offsets, offsetsSize);
+		case JPEG:
+			getJPEGOffsets(buffer, bufferSize, offsets, offsetsSize);
 			break;
 		case PNG:
 			getPNGOffsets(buffer, bufferSize, offsets, offsetsSize);
@@ -41,7 +41,7 @@ void startFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize
 			break;
 		case BITMAP:
 			break;
-		case JFIF:
+		case JPEG:
 			break;
 		case PNG:
 			startPNGBuffer(buffer, bufferSize, offsets, offsetsSize);
@@ -59,7 +59,7 @@ void endFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize, 
 			break;
 		case BITMAP:
 			break;
-		case JFIF:
+		case JPEG:
 			break;
 		case PNG:
 			endPNGBuffer(buffer, bufferSize, offsets, offsetsSize);

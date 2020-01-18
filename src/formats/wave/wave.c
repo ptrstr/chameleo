@@ -19,10 +19,10 @@ void getWAVEOffsets(unsigned char *buffer, unsigned long long int bufferSize, un
 	*offsets = (unsigned long long int**)calloc(sizeof(unsigned long long int*), *offsetsSize);
 	if (!*offsets)
 		return;
-	*offsets[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int*), 2);
+	*offsets[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
 	if (!*offsets[0])
 		return;
-	
+
 	// Find data section
 	*offsets[0][0] = 0;
 	for (unsigned long i = 0; i < bufferSize; i++) {

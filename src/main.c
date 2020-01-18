@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 					showError("Bit pattern invalid! Make sure you are entering full bytes!");
 				activeBits = (uByte*)calloc(strlen(argv[i+1]) / 8, sizeof(uByte));
 				activeBitsSize = strlen(argv[i+1]) / 8;
-				for (unsigned long long int j = 0; j < strlen(argv[j+1]); j += 8) {
+				for (unsigned long long int j = 0; j < strlen(argv[i+1]); j += 8) {
 					unsigned char currentActiveBits[8] = {argv[i+1][j], argv[i+1][j+1], argv[i+1][j+2], argv[i+1][j+3], argv[i+1][j+4], argv[i+1][j+5], argv[i+1][j+6], argv[i+1][j+7]};
 					activeBits[j/8].byte = strtoul((char*)currentActiveBits, NULL, 2);
 				}
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
 	getFormatOffsets(targetBuffer, targetSize, format, &offsets, &offsetsSize);
 	if (!offsets)
 		showError("An error occured while reading the file! Make sure enough memory is free on your system and that the file is not corrupted.");
-	
+
 	// Prepare buffer for exceptions
 	startFormatBuffer(&targetBuffer, targetSize, format, offsets, offsetsSize);
 

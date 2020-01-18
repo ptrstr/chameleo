@@ -3,6 +3,7 @@
 #include <string.h>
 #include "../../uByte/uByte.h"
 #include <zlib.h>
+#include <png.h>
 
 unsigned char detectPNG(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (buffer[0] != 0x89 ||
@@ -23,7 +24,7 @@ void getPNGOffsets(unsigned char *buffer, unsigned long long int bufferSize, uns
 			*offsets = (unsigned long long int**)realloc(*offsets, sizeof(unsigned long long int*) * (*offsetsSize));
 			if (!*offsets)
 				return;
-			(*offsets)[*offsetsSize - 1] = (unsigned long long int*)calloc(sizeof(unsigned long long int*), 2);
+			(*offsets)[*offsetsSize - 1] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
 			if (!(*offsets)[*offsetsSize - 1])
 				return;
 			unsigned int IDATChunkSize = 0;
@@ -61,7 +62,7 @@ unsigned int crc32(unsigned int crc, unsigned char *buffer, unsigned int hashSiz
 		}
 		table[i] = rem;
 	}
- 
+
 	crc = ~crc;
 	q = buffer + hashSize;
 	for (p = buffer; p < q; p++) {
@@ -71,11 +72,7 @@ unsigned int crc32(unsigned int crc, unsigned char *buffer, unsigned int hashSiz
 }*/
 
 void startPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
-	for (unsigned long long int i = 0; i < offsetsSize; i++) {
-		for (unsigned long long int offset = offsets[i][0]; offset < offsets[i][1]; offset++) {
-			
-		}
-	}
+
 }
 
 void endPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {

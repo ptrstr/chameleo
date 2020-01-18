@@ -6,8 +6,9 @@ endif(APPLE AND UNIX)
 
 project(stegano)
 
-SET(CMAKE_C_FLAGS "-Wall -lz -wunused-command-line-argument")
+SET(CMAKE_C_FLAGS "-Wall -Wno-unused-command-line-argument")
 
 file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 
 add_executable(stegano ${SOURCES})
+target_link_libraries(stegano z png -static)

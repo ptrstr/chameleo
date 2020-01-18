@@ -24,10 +24,10 @@ void getBitmapOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 	*offsets = (unsigned long long int**)calloc(sizeof(unsigned long long int*), *offsetsSize);
 	if (!offsets)
 		return;
-	(*offsets)[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int*), 2);
+	(*offsets)[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
 	if (!offsets[0])
 		return;
-	
+
 	// Extract pixel data start from header
 	memcpy(&((*offsets)[0][0]), buffer + 0x0A, 4);
 
