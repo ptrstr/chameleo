@@ -1,5 +1,6 @@
 #include "wave.h"
 #include <stdlib.h>
+#include "../utility.h"
 
 unsigned char detectWAVE(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (buffer[0] != 0x52 ||
@@ -15,27 +16,19 @@ unsigned char detectWAVE(unsigned char *buffer, unsigned long long int bufferSiz
 }
 
 void getWAVEOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
-	(*offsetsSize)++;
-	*offsets = (unsigned long long int**)calloc(sizeof(unsigned long long int*), *offsetsSize);
-	if (!*offsets)
-		return;
-	*offsets[0] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
-	if (!*offsets[0])
-		return;
-
 	// Find data section
-	*offsets[0][0] = 0;
+	unsigned long long int start = 0;
 	for (unsigned long i = 0; i < bufferSize; i++) {
 		if (buffer[i] == 0x64 && buffer[i+1] == 0x61 && buffer[i+2] == 0x74 && buffer[i+3] == 0x61) {
-			*offsets[0][0] = i + 8;
+			start = i + 8;
 			break;
 		}
 	}
 
 	// Spreads across all file
-	*offsets[0][1] = bufferSize;
+	addOffset(offsets, offsetsSize, start, bufferSize);
 
-	if (*offsets[0][0] == 0) *offsets[0][1] = 0;
+	if (*offsets[0][0] == 0) setOffset(offsets, offsetsSize, 1, 0);
 
 	return;
 }

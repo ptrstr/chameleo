@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../../uByte/uByte.h"
 #include <zlib.h>
-#include <png.h>
+#include "../utility.h"
 
 unsigned char detectPNG(unsigned char *buffer, unsigned long long int bufferSize) {
 	if (buffer[0] != 0x89 ||
@@ -20,13 +20,6 @@ unsigned char detectPNG(unsigned char *buffer, unsigned long long int bufferSize
 void getPNGOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
 	for (unsigned long long int i = 0; i < bufferSize; i++) {
 		if (buffer[i] == 'I' && buffer[i+1] == 'D' && buffer[i+2] == 'A' && buffer[i+3] == 'T') {
-			(*offsetsSize)++;
-			*offsets = (unsigned long long int**)realloc(*offsets, sizeof(unsigned long long int*) * (*offsetsSize));
-			if (!*offsets)
-				return;
-			(*offsets)[*offsetsSize - 1] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
-			if (!(*offsets)[*offsetsSize - 1])
-				return;
 			unsigned int IDATChunkSize = 0;
 			memcpy(&IDATChunkSize, buffer + i - 4, 4);
 			{
@@ -37,8 +30,7 @@ void getPNGOffsets(unsigned char *buffer, unsigned long long int bufferSize, uns
 					IDATChunkSize = ((IDATChunkSizeBigEndian& 0x000000ff) << 24u) | ((IDATChunkSizeBigEndian& 0x0000ff00) << 8u) | ((IDATChunkSizeBigEndian& 0x00ff0000) >> 8u) | ((IDATChunkSizeBigEndian& 0xff000000) >> 24u);
 				}
 			}
-			(*offsets)[*offsetsSize - 1][0] = i + 6;
-			(*offsets)[*offsetsSize - 1][1] = i + 4 + IDATChunkSize;
+			addOffset(offsets, offsetsSize, i + 4, i + 4 + IDATChunkSize);
 		}
 	}
 }
