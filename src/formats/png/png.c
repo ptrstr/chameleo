@@ -57,14 +57,14 @@ unsigned int crc32(unsigned int crc, unsigned char *buffer, unsigned int hashSiz
 	return ~crc;
 }*/
 
-void startPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+void startPNGBuffer(unsigned char **buffer, unsigned long long int *bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
 	unsigned int width = 0;
 	unsigned int height = 0;
 	unsigned char bitDepth;
 	unsigned char colorType;
 	unsigned char compressionType;
 	
-	for (unsigned long long int i = 0; i < bufferSize; i++) {
+	for (unsigned long long int i = 0; i < (*bufferSize); i++) {
 		if ((*buffer)[i] == 'I' && (*buffer)[i+1] == 'H' && (*buffer)[i+2] == 'D' && (*buffer)[i+3] == 'R') {
 			memcpy(&width, (*buffer) + i + 4, 4);
 			ltob(&width);
@@ -105,26 +105,69 @@ void startPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, u
 	uLong compressedSize = 0;
 	unsigned char *compressedBuffer = (unsigned char*)calloc(compressedSize, 1);
 	
-	for (unsigned long long int i = 0; i < offsetsSize; i++) {
-		compressedSize += offsets[i][1] - offsets[i][0];
+	for (unsigned long long int i = 0; i < *offsetsSize; i++) {
+		compressedSize += (*offsets)[i][1] - (*offsets)[i][0];
 		compressedBuffer = (unsigned char*)realloc(compressedBuffer, compressedSize);
-		memcpy(compressedBuffer + compressedSize - (offsets[i][1] - offsets[i][0]), (*buffer) + offsets[i][0], offsets[i][1] - offsets[i][0]);
+		memcpy(compressedBuffer + compressedSize - ((*offsets)[i][1] - (*offsets)[i][0]), (*buffer) + (*offsets)[i][0], (*offsets)[i][1] - (*offsets)[i][0]);
 	}
 	
 	uLong uncompressedSizeCopy = uncompressedSize;
+	printf("%ld - %ld\n", uncompressedSize, compressedSize);
 	
 	uncompress((Bytef*)uncompressedBuffer, &uncompressedSizeCopy, (Bytef*)compressedBuffer, compressedSize);
 	
+	*buffer  = (unsigned char*)realloc((*buffer), (*bufferSize) + uncompressedSize);
+	memcpy((*buffer) + (*bufferSize), uncompressedBuffer, uncompressedSize);
 	
+	free(*offsets);
+	*offsetsSize = 0;
+	for (unsigned long long int i = *bufferSize; i < *bufferSize + uncompressedSize; i += (width * (bitsPerPixel/8)) + 1)
+		addOffset(offsets, offsetsSize, i + 1, i + (width * (bitsPerPixel/8)) + 1);
+	
+	*bufferSize += uncompressedSize;
 	
 	free(compressedBuffer);
 	free(uncompressedBuffer);
 }
 
-void endPNGBuffer(unsigned char **buffer, unsigned long long int bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
-	for (unsigned long long int i = 0; i < offsetsSize; i++) {
-		unsigned int hash = crc32(0, (*buffer) + offsets[i][0] - 4, offsets[i][1] - offsets[i][0] + 4);
-		ltob(&hash);
-		memcpy((*buffer) + offsets[i][1] - offsets[i][0], &hash, 4);
+void endPNGBuffer(unsigned char **buffer, unsigned long long int *bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+	uLong uncompressedSize = offsets[offsetsSize - 1][1] - offsets[0][0] + 1;
+	uLong compressedSize = compressBound(uncompressedSize);
+	
+	unsigned char *compressedBuffer = (unsigned char*)calloc(compressedSize, 1);
+	if (!compressedBuffer)
+		return;
+	
+	compress2((Bytef*)compressedBuffer, &compressedSize, (Bytef*)((*buffer) + offsets[0][0]), uncompressedSize, 9);
+	
+	*buffer = (unsigned char*)realloc(*buffer, offsets[0][0]);
+	*bufferSize = offsets[0][0];
+	
+	for (unsigned long long int i = 0; i < (*bufferSize); i++) {
+		if ((*buffer)[i] == 'I' && (*buffer)[i+1] == 'D' && (*buffer)[i+2] == 'A' && (*buffer)[i+3] == 'T') {
+			unsigned int IDATChunkSize = compressedSize;
+			btol(&IDATChunkSize);
+			memcpy((*buffer) + i - 4, &IDATChunkSize, 4);
+		}
 	}
+	
+	unsigned long long int compressedBufferIndex = 0;
+	
+	for (unsigned long long int i = 0; i < (*bufferSize); i++) {
+		if ((*buffer)[i] == 'I' && (*buffer)[i+1] == 'D' && (*buffer)[i+2] == 'A' && (*buffer)[i+3] == 'T') {
+			unsigned int IDATChunkSize = 0;
+			memcpy(&IDATChunkSize, (*buffer) + i - 4, 4);
+			ltob(&IDATChunkSize);
+			
+			memcpy((*buffer) + i + 4, compressedBuffer + compressedBufferIndex, IDATChunkSize);
+			
+			compressedBufferIndex += IDATChunkSize;
+			
+			unsigned int hash = crc32(0, (*buffer) + i, IDATChunkSize + 4);
+			ltob(&hash);
+			memcpy((*buffer) + i + 4 + IDATChunkSize, &hash, 4);
+		}
+	}
+	
+	free(compressedBuffer);
 }

@@ -180,7 +180,7 @@ int main(int argc, char *argv[]) {
 		showError("An error occured while reading the file! Make sure enough memory is free on your system and that the file is not corrupted.");
 
 	// Prepare buffer for exceptions
-	startFormatBuffer(&targetBuffer, targetSize, format, offsets, offsetsSize);
+	startFormatBuffer(&targetBuffer, &targetSize, format, &offsets, &offsetsSize);
 
 	outputFile = fopen(outputFileName, "w");
 	if (!outputFile)
@@ -230,7 +230,7 @@ int main(int argc, char *argv[]) {
 			showError("An unhandled error happened.");
 
 		// Finish off any exceptions
-		endFormatBuffer(&outputBuffer, targetSize, format, offsets, offsetsSize);
+		endFormatBuffer(&outputBuffer, &targetSize, format, offsets, offsetsSize);
 
 		printf("Successfully steganographed %lld bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
 
@@ -255,7 +255,6 @@ int main(int argc, char *argv[]) {
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Desteganograph!
-
 		unsigned char status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 2)
 			showError("An unhandled error happened.");
@@ -280,7 +279,7 @@ int main(int argc, char *argv[]) {
 	free(outputBuffer);
 	for (unsigned long long int i = 0; i < offsetsSize; i++)
 		free(offsets[i]);
-	free(offsets);
+	//free(offsets);
 
 	return 0;
 

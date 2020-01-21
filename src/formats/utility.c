@@ -29,12 +29,19 @@ void setOffset(unsigned long long int ***offsets, unsigned long long int *offset
 }
 
 void ltob(unsigned int *little) {
-	{
-		uByte endianness;
-		endianness.byte = 1;
-		if (endianness.bits.bit7 != 1) {
-			unsigned int big = *little;
-			*little = ((big & 0x000000ff) << 24u) | ((big & 0x0000ff00) << 8u) | ((big & 0x00ff0000) >> 8u) | ((big & 0xff000000) >> 24u);
-		}
+	uByte endianness;
+	endianness.byte = 1;
+	if (endianness.bits.bit7 != 1) {
+		unsigned int big = *little;
+		*little = ((big & 0x000000ff) << 24u) | ((big & 0x0000ff00) << 8u) | ((big & 0x00ff0000) >> 8u) | ((big & 0xff000000) >> 24u);
+	}
+}
+
+void btol(unsigned int *big) {
+	uByte endianness;
+	endianness.byte = 1;
+	if (endianness.bits.bit1 != 1) {
+		unsigned int little = *big;
+		*big = ((little & 0x000000ff) << 24u) | ((little & 0x0000ff00) << 8u) | ((little & 0x00ff0000) >> 8u) | ((little & 0xff000000) >> 24u);
 	}
 }

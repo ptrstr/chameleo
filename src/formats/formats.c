@@ -35,7 +35,7 @@ void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 	return;
 }
 
-void startFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+void startFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
 	switch (format) {
 		case WAVE:
 			break;
@@ -53,7 +53,7 @@ void startFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize
 	return;
 }
 
-void endFormatBuffer(unsigned char **buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+void endFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
 	switch (format) {
 		case WAVE:
 			break;
