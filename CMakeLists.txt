@@ -11,4 +11,4 @@ SET(CMAKE_C_FLAGS "-Wall -Wno-unused-command-line-argument")
 file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 
 add_executable(stegano ${SOURCES})
-target_link_libraries(stegano z -static)
+target_link_libraries(stegano z )#-static)
