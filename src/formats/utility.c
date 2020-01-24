@@ -14,10 +14,9 @@ void addOffset(unsigned long long int ***offsets, unsigned long long int *offset
 			return;
 	}
 	
-	(*offsets)[(*offsetsSize) - 1] = (unsigned long long int*)calloc(sizeof(unsigned long long int), 2);
+	(*offsets)[(*offsetsSize) - 1] = (unsigned long long int*)calloc(2, sizeof(unsigned long long int));
 	if (!(*offsets)[(*offsetsSize) - 1])
 		return;
-	
 	(*offsets)[(*offsetsSize) - 1][0] = start;
 	(*offsets)[(*offsetsSize) - 1][1] = end;
 	return;

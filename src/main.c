@@ -38,10 +38,12 @@
 	{ printf("" \
 			"stegano " VERSION "\n" \
 			"Copyright (C) 2020 ptrstr.\n" \
+			"This program uses zlib for the PNG (de)compression.\n" \
 			"\nSupported Formats:\n" \
 			"    WAVE audio file (.wav)\n" \
 			"    JFIF image file (.jpg)\n" \
 			"    BMP image file (.bmp)\n" \
+			"    PNG image file (.png)\n" \
 			); goto errorfree; }
 
 int main(int argc, char *argv[]) {
