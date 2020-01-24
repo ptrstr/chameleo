@@ -4,11 +4,11 @@
 #include "uByte/uByte.h"
 #include "formats/formats.h"
 #include "steganographer/steganographer.h"
-#define VERSION "0.1"
+#define VERSION "0.2"
 
 
 #define showError(errorMessage) \
-	{ printf("Error: " errorMessage "\n"); goto errorfree; }
+	{ fprintf(stderr, "Error: " errorMessage "\n"); goto errorfree; }
 #define showHelp() \
 	{ printf("" \
 			"Usage: %s [OPTIONS]\n" \
