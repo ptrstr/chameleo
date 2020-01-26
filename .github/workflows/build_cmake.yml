@@ -1,0 +1,24 @@
+name: CMake Build
+
+on: [push]
+
+jobs:
+  build-Linux-x86_64:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: build
+      run: |
+        ./build.sh
+        
+  build-MacOS-x86_64:
+
+    runs-on: macos-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: build
+      run: |
+        ./build.sh
