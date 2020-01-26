@@ -15,10 +15,14 @@ endif (UNIX)
 file(GLOB SOURCES "src/*.c" "src/*/*.c" "src/formats/*/*.c")
 
 add_executable(stegano ${SOURCES})
-if (NOT APPLE)
+if (NOT APPLE AND UNIX)
   target_link_libraries(stegano z -static)
-endif (NOT APPLE)
+endif (NOT APPLE AND UNIX)
 
 if (APPLE)
   target_link_libraries(stegano z)
 endif (APPLE)
+
+if (WIN32)
+  target_link_libraries(stegano zlibstat)
+endif (WIN32)
