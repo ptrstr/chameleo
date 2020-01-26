@@ -4,21 +4,30 @@ on: [push]
 
 jobs:
   build-Linux-x86_64:
-
     runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v1
-    - name: build
+    - name: Build
       run: |
         ./build.sh
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: stegano for Linux x86_64
+        path: ./build/stegano
         
   build-MacOS-x86_64:
-
     runs-on: macos-latest
     
     steps:
     - uses: actions/checkout@v1
-    - name: build
+    - name: Build
       run: |
         ./build.sh
+    
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: stegano for MacOS x86_64
+        path: ./build/stegano
