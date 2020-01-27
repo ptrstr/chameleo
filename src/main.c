@@ -4,7 +4,7 @@
 #include "uByte/uByte.h"
 #include "formats/formats.h"
 #include "steganographer/steganographer.h"
-#define VERSION "0.2"
+#define VERSION "0.2.1"
 
 
 #define showError(errorMessage) \
@@ -30,7 +30,7 @@
 			"    -h, --help           Print this message and exit\n" \
 			"    -v, --version        Print version information and other information and exit\n" \
 			"    --size-header        Will add a header to the steganographed data indicating the size of the data.\n" \
-			"                         With this argument the -s argument can be suppressed in DECODING" \
+			"                         With this argument the -s argument can be suppressed in DECODING\n" \
 			"On errors, the help message or the version information, the program will exit with exit code 1.\n" \
 			"Otherwise it will return 0.\n" \
 			, argv[0]); goto errorfree; }
