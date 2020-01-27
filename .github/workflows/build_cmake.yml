@@ -14,7 +14,7 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
-        name: stegano for Linux x86_64
+        name: Linux-x86_64
         path: ./build/stegano
         
   build-MacOS-x86_64:
@@ -29,5 +29,5 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
-        name: stegano for MacOS x86_64
+        name: MacOS-x86_64
         path: ./build/stegano
