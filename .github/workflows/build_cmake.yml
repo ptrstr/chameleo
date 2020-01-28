@@ -39,7 +39,7 @@ jobs:
     - uses: actions/checkout@v1
     - name: Configure
       run: |
-        apt install mingw-w64 libz-mingw-w64-dev
+        sudo apt install mingw-w64 libz-mingw-w64-dev
         export CC=/usr/bin/x86_64-w64-mingw32-gcc
       
     - name: Build
