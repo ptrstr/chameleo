@@ -45,6 +45,7 @@ jobs:
       run: |
         export CC=/usr/bin/x86_64-w64-mingw32-gcc
         ./build.sh
+        mv ./build/stegano* ./build/stegano.exe
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
