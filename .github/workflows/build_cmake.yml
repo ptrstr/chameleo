@@ -40,10 +40,10 @@ jobs:
     - name: Configure
       run: |
         sudo apt install mingw-w64 libz-mingw-w64-dev
-        export CC=/usr/bin/x86_64-w64-mingw32-gcc
       
     - name: Build
       run: |
+        export CC=/usr/bin/x86_64-w64-mingw32-gcc
         ./build.sh
     
     - name: Upload Artifact
