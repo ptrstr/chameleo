@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <inttypes.h>
 #include "uByte/uByte.h"
 #include "formats/formats.h"
 #include "steganographer/steganographer.h"
@@ -49,27 +50,27 @@
 int main(int argc, char *argv[]) {
 	// Variable Initialization
 	uByte *activeBits;
-	unsigned long long int activeBitsSize = 0;
-	unsigned char isEncoding = 2;
+	uint64_t activeBitsSize = 0;
+	uint8_t isEncoding = 2;
 
-	unsigned char *targetBuffer = NULL;
-	unsigned long long int targetSize;
+	uint8_t *targetBuffer = NULL;
+	uint64_t targetSize;
 	FILE *targetFile = NULL;
 	char *targetFileName = NULL;
 
-	unsigned char *secretBuffer = NULL;
-	unsigned long long int secretSize;
+	uint8_t *secretBuffer = NULL;
+	uint64_t secretSize;
 	FILE *secretFile = NULL;
 	char *secretFileName = NULL;
 
-	unsigned char *outputBuffer = NULL; // Will only be allocated when steganographer is encoding. Declared here for the errorfree: label
+	uint8_t *outputBuffer = NULL; // Will only be allocated when steganographer is encoding. Declared here for the errorfree: label
 	FILE *outputFile = NULL;
 	char *outputFileName = NULL;
 
-	unsigned long long int *(*offsets) = NULL;
-	unsigned long long int offsetsSize = 0;
+	uint64_t *(*offsets) = NULL;
+	uint64_t offsetsSize = 0;
 
-	unsigned char isUsingHeader = 0;
+	uint8_t isUsingHeader = 0;
 
 	// Verify Parameters and Assign Them
 	{ // In Scope to prevent access to unnecessary and temporary variables from other places in the function
@@ -89,8 +90,8 @@ int main(int argc, char *argv[]) {
 					showError("Bit pattern invalid! Make sure you are entering full bytes!");
 				activeBits = (uByte*)calloc(strlen(argv[i+1]) / 8, sizeof(uByte));
 				activeBitsSize = strlen(argv[i+1]) / 8;
-				for (unsigned long long int j = 0; j < strlen(argv[i+1]); j += 8) {
-					unsigned char currentActiveBits[8] = {argv[i+1][j], argv[i+1][j+1], argv[i+1][j+2], argv[i+1][j+3], argv[i+1][j+4], argv[i+1][j+5], argv[i+1][j+6], argv[i+1][j+7]};
+				for (uint64_t j = 0; j < strlen(argv[i+1]); j += 8) {
+					uint8_t currentActiveBits[8] = {argv[i+1][j], argv[i+1][j+1], argv[i+1][j+2], argv[i+1][j+3], argv[i+1][j+4], argv[i+1][j+5], argv[i+1][j+6], argv[i+1][j+7]};
 					activeBits[j/8].byte = strtoul((char*)currentActiveBits, NULL, 2);
 				}
 				setBit(&mandatoryCheck, 0, 1, 0);
@@ -124,10 +125,10 @@ int main(int argc, char *argv[]) {
 
 		if (isUsingHeader && isEncoding == 0) setBit(&mandatoryCheck, 3, 1, 0);
 
-		unsigned char requiredArguments = 4;
+		uint8_t requiredArguments = 4;
 		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1) requiredArguments = 5;
 		if (countBits(mandatoryCheck) < requiredArguments || isEncoding == 2) {
-			for (unsigned char i = 0; i < requiredArguments; i++) {
+			for (uint8_t i = 0; i < requiredArguments; i++) {
 				if (getBit(mandatoryCheck, i, 0) == 0) {
 					signed char argument[6] = {'-', 0, 0, 0, 0, 0};
 					switch (i) {
@@ -164,7 +165,7 @@ int main(int argc, char *argv[]) {
 	fseek(targetFile, 0, SEEK_END);
 	targetSize = ftell(targetFile);
 	rewind(targetFile);
-	targetBuffer = (unsigned char*)calloc(targetSize, 1);
+	targetBuffer = (uint8_t*)calloc(targetSize, 1);
 	if (!targetBuffer)
 		showError("Target buffer could not be allocated! Make sure enough memory is free on your system.");
 	fread(targetBuffer, targetSize, 1, targetFile);
@@ -197,7 +198,7 @@ int main(int argc, char *argv[]) {
 		fseek(secretFile, 0, SEEK_END);
 		secretSize = ftell(secretFile);
 		rewind(secretFile);
-		secretBuffer = (unsigned char*)calloc(secretSize, 1);
+		secretBuffer = (uint8_t*)calloc(secretSize, 1);
 		if (!secretBuffer)
 			showError("Secret buffer could not be allocated! Make sure enough memory is free on your system.");
 		fread(secretBuffer, secretSize, 1, secretFile);
@@ -206,26 +207,26 @@ int main(int argc, char *argv[]) {
 
 		// Add header if necessary
 		if (isUsingHeader) {
-			unsigned char *secretBufferBackup = (unsigned char*)calloc(secretSize, 1);
+			uint8_t *secretBufferBackup = (uint8_t*)calloc(secretSize, 1);
 			if (!secretBufferBackup)
 				showError("Secret buffer backup could not be allocated! Make sure enough memory is free on your system.");
 			memcpy(secretBufferBackup, secretBuffer, secretSize);
-			secretBuffer = (unsigned char*)realloc(secretBuffer, secretSize + sizeof(unsigned long long int));
+			secretBuffer = (uint8_t*)realloc(secretBuffer, secretSize + sizeof(uint64_t));
 			if (!secretBuffer)
 				showError("Secret buffer could not be reallocated! Make sure enough memory is free on your system.");
-			secretSize += sizeof(unsigned long long int);
-			memcpy(secretBuffer, &secretSize, sizeof(unsigned long long int));
-			memcpy(secretBuffer + sizeof(unsigned long long int), secretBufferBackup, secretSize - sizeof(unsigned long long int));
+			secretSize += sizeof(uint64_t);
+			memcpy(secretBuffer, &secretSize, sizeof(uint64_t));
+			memcpy(secretBuffer + sizeof(uint64_t), secretBufferBackup, secretSize - sizeof(uint64_t));
 			free(secretBufferBackup);
 		}
 
 		// Allocate output
-		outputBuffer = (unsigned char*)calloc(targetSize, 1);
+		outputBuffer = (uint8_t*)calloc(targetSize, 1);
 		if (!outputBuffer)
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Steganograph!
-		unsigned char status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, offsetsSize, activeBits, activeBitsSize);
+		uint8_t status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 1)
 			showError("File size mismatch! Secret file can't fit in target with this configuration!");
 		if (status == 2)
@@ -234,40 +235,40 @@ int main(int argc, char *argv[]) {
 		// Finish off any exceptions
 		endFormatBuffer(&outputBuffer, &targetSize, format, offsets, offsetsSize);
 
-		printf("Successfully steganographed %lld bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
+		printf("Successfully steganographed %" PRId64 " bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
-		for (unsigned long long int i = 0; i < targetSize; i++)
+		for (uint64_t i = 0; i < targetSize; i++)
 			fputc(outputBuffer[i], outputFile);
 	} else if (isEncoding == 0) {
 		// Get size from header if present
 		if (isUsingHeader) {
-			unsigned char *secretChunkSize = (unsigned char*)calloc(sizeof(unsigned long long int), 1);
+			uint8_t *secretChunkSize = (uint8_t*)calloc(sizeof(uint64_t), 1);
 			if (!secretChunkSize)
 				showError("Secret chunk size buffer could not be allocated! Make sure enough memory is free on your system.");
-			unsigned char status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(unsigned long long int), offsets, offsetsSize, activeBits, activeBitsSize);
+			uint8_t status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(uint64_t), offsets, offsetsSize, activeBits, activeBitsSize);
 			if (status == 2)
 				showError("An unhandled error happened.");
-			memcpy(&secretSize, secretChunkSize, sizeof(unsigned long long int));
+			memcpy(&secretSize, secretChunkSize, sizeof(uint64_t));
 		}
 
 		// Allocate output
-		outputBuffer = (unsigned char*)calloc(secretSize, 1);
+		outputBuffer = (uint8_t*)calloc(secretSize, 1);
 		if (!outputBuffer)
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Desteganograph!
-		unsigned char status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
+		uint8_t status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 2)
 			showError("An unhandled error happened.");
 
-		printf("Successfully desteganographed %lld bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
+		printf("Successfully desteganographed %" PRId64 " bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
-		unsigned long long int beginningOffset = 0;
+		uint64_t beginningOffset = 0;
 		if (isUsingHeader)
-			beginningOffset = sizeof(unsigned long long int);
-		for (unsigned long long int i = beginningOffset; i < secretSize; i++)
+			beginningOffset = sizeof(uint64_t);
+		for (uint64_t i = beginningOffset; i < secretSize; i++)
 			fputc(outputBuffer[i], outputFile);
 	} else {
 		showError("[visible confusion]");
@@ -279,7 +280,7 @@ int main(int argc, char *argv[]) {
 	free(targetBuffer);
 	free(secretBuffer);
 	free(outputBuffer);
-	for (unsigned long long int i = 0; i < offsetsSize; i++)
+	for (uint64_t i = 0; i < offsetsSize; i++)
 		free(offsets[i]);
 	//free(offsets);
 

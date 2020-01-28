@@ -1,6 +1,7 @@
 #pragma once
+#include "../utility.h"
 
-unsigned char detectPNG(unsigned char *buffer, unsigned long long int bufferSize);
-void getPNGOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize);
-void startPNGBuffer(unsigned char **buffer, unsigned long long int *bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize);
-void endPNGBuffer(unsigned char **buffer, unsigned long long int *bufferSize, unsigned long long int **offsets, unsigned long long int offsetsSize);
+uint8_t detectPNG(uint8_t *buffer, uint64_t bufferSize);
+void getPNGOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize);
+void startPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t ***offsets, uint64_t *offsetsSize);
+void endPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t **offsets, uint64_t offsetsSize);

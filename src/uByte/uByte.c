@@ -1,6 +1,6 @@
 #include "uByte.h"
 
-unsigned char getBit(uByte byte, unsigned char index, unsigned char littleEndian) {
+uint8_t getBit(uByte byte, uint8_t index, uint8_t littleEndian) {
 	// Verify Host Endianess and Switch if Little
 	uByte host;
 	host.byte = 1;
@@ -10,7 +10,7 @@ unsigned char getBit(uByte byte, unsigned char index, unsigned char littleEndian
 		else
 			littleEndian = 0;
 	}
-	
+
 	if (littleEndian == 1) { // Endianess check
 		switch (index) {
 		case 0:
@@ -73,7 +73,7 @@ unsigned char getBit(uByte byte, unsigned char index, unsigned char littleEndian
 	return 2;
 }
 
-void setBit(uByte *byte, unsigned char index, unsigned char newValue, unsigned char littleEndian) {
+void setBit(uByte *byte, uint8_t index, uint8_t newValue, uint8_t littleEndian) {
 	// Verify Host Endianess and Switch if Little
 	uByte host;
 	host.byte = 1;
@@ -83,7 +83,7 @@ void setBit(uByte *byte, unsigned char index, unsigned char newValue, unsigned c
 		else
 			littleEndian = 0;
 	}
-	
+
 	if (newValue == 0 || newValue == 1) {
 		if (littleEndian == 1) { // Endianess check
 			switch (index) {
@@ -147,9 +147,9 @@ void setBit(uByte *byte, unsigned char index, unsigned char newValue, unsigned c
 	}
 }
 
-unsigned char countBits(uByte byte) {
-	unsigned char bitCounter = 0;
-	for (unsigned char i = 0; i < 8; i++) {
+uint8_t countBits(uByte byte) {
+	uint8_t bitCounter = 0;
+	for (uint8_t i = 0; i < 8; i++) {
 		if (getBit(byte, i, 0) == 1) {
 			bitCounter++;
 		}

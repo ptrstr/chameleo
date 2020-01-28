@@ -6,7 +6,7 @@
 #include "jpeg/jpeg.h"
 #include "png/png.h"
 
-FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize) {
+FORMAT getFormat(uint8_t *buffer, uint64_t bufferSize) {
 	if (detectWAVE(buffer, bufferSize)) return WAVE;
 	if (detectBitmap(buffer, bufferSize)) return BITMAP;
 	if (detectJPEG(buffer, bufferSize)) return JPEG;
@@ -14,7 +14,7 @@ FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize) {
 	return NULLFORMAT;
 }
 
-void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
+void getFormatOffsets(uint8_t *buffer, uint64_t bufferSize, FORMAT format, uint64_t ***offsets, uint64_t *offsetsSize) {
 	switch (format) {
 		case WAVE:
 			getWAVEOffsets(buffer, bufferSize, offsets, offsetsSize);
@@ -35,7 +35,7 @@ void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 	return;
 }
 
-void startFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
+void startFormatBuffer(uint8_t **buffer, uint64_t *bufferSize, FORMAT format, uint64_t ***offsets, uint64_t *offsetsSize) {
 	switch (format) {
 		case WAVE:
 			break;
@@ -53,7 +53,7 @@ void startFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSiz
 	return;
 }
 
-void endFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize) {
+void endFormatBuffer(uint8_t **buffer, uint64_t *bufferSize, FORMAT format, uint64_t **offsets, uint64_t offsetsSize) {
 	switch (format) {
 		case WAVE:
 			break;

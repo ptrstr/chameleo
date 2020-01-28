@@ -1,8 +1,9 @@
 #pragma once
+#include <inttypes.h>
 
-void addOffset(unsigned long long int ***offsets, unsigned long long int *offsetsSize, unsigned long long int start, unsigned long long int end);
+void addOffset(uint64_t ***offsets, uint64_t *offsetsSize, uint64_t start, uint64_t end);
 
-void setOffset(unsigned long long int ***offsets, unsigned long long int *offsetsSize, unsigned long long int index, unsigned long long int newOffset);
+void setOffset(uint64_t ***offsets, uint64_t *offsetsSize, uint64_t index, uint64_t newOffset);
 
-void ltob(unsigned int *little);
-void btol(unsigned int *big);
+void ltob(uint32_t *little);
+void btol(uint32_t *big);

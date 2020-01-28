@@ -1,11 +1,10 @@
 #include "bitmap.h"
 #include <stdlib.h>
 #include <string.h>
-#include "../utility.h"
 
 // TODO: Endianess
 
-unsigned char detectBitmap(unsigned char *buffer, unsigned long long int bufferSize) {
+uint8_t detectBitmap(uint8_t *buffer, uint64_t bufferSize) {
 	// Will only check header
 	unsigned short headerField;
 	memcpy(&headerField, buffer, 2);
@@ -22,9 +21,9 @@ unsigned char detectBitmap(unsigned char *buffer, unsigned long long int bufferS
 	return 1;
 }
 
-void getBitmapOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
+void getBitmapOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize) {
 	// Extract pixel data start from header
-	unsigned long long int start;
+	uint64_t start;
 	memcpy(&start, buffer + 0x0A, 4);
 
 	// Get end offset
@@ -34,15 +33,15 @@ void getBitmapOffsets(unsigned char *buffer, unsigned long long int bufferSize, 
 	if (width % 4 != 0) width += 4 - (width % 4);
 	memcpy(&height, buffer + 0x16, 4);
 
-	unsigned long long int pixels = width * height;
+	uint64_t pixels = width * height;
 
 	// Get bits per pixel
 	unsigned short bitsPerPixel = 0;
 	memcpy(&bitsPerPixel, buffer + 0x1C, 2);
 
 	// Get end offset
-	unsigned long long int pixelDataBytes = pixels * (bitsPerPixel / 8);
-	
+	uint64_t pixelDataBytes = pixels * (bitsPerPixel / 8);
+
 	addOffset(offsets, offsetsSize, start, start + pixelDataBytes);
 
 	return;

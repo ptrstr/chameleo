@@ -1,4 +1,5 @@
 #pragma once
+#include "../utility.h"
 
-unsigned char detectWAVE(unsigned char *buffer, unsigned long long int bufferSize);
-void getWAVEOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize);
+uint8_t detectWAVE(uint8_t *buffer, uint64_t bufferSize);
+void getWAVEOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize);

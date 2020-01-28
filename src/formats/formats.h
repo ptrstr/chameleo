@@ -1,4 +1,5 @@
 #pragma once
+#include <inttypes.h>
 
 typedef enum {
 	NULLFORMAT,
@@ -8,7 +9,7 @@ typedef enum {
 	PNG
 } FORMAT;
 
-FORMAT getFormat(unsigned char *buffer, unsigned long long int bufferSize);
-void getFormatOffsets(unsigned char *buffer, unsigned long long int bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize);
-void startFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int ***offsets, unsigned long long int *offsetsSize);
-void endFormatBuffer(unsigned char **buffer, unsigned long long int *bufferSize, FORMAT format, unsigned long long int **offsets, unsigned long long int offsetsSize);
+FORMAT getFormat(unsigned char *buffer, uint64_t bufferSize);
+void getFormatOffsets(unsigned char *buffer, uint64_t bufferSize, FORMAT format, uint64_t ***offsets, uint64_t *offsetsSize);
+void startFormatBuffer(unsigned char **buffer, uint64_t *bufferSize, FORMAT format, uint64_t ***offsets, uint64_t *offsetsSize);
+void endFormatBuffer(unsigned char **buffer, uint64_t *bufferSize, FORMAT format, uint64_t **offsets, uint64_t offsetsSize);

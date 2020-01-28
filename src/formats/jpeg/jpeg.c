@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../../uByte/uByte.h"
-#include "../utility.h"
 
-unsigned char detectJPEG(unsigned char *buffer, unsigned long long int bufferSize) {
+uint8_t detectJPEG(uint8_t *buffer, uint64_t bufferSize) {
 	if (buffer[0] != 0xFF ||
  			buffer[1] != 0xD8 ||
 			buffer[2] != 0xFF)
@@ -12,8 +11,8 @@ unsigned char detectJPEG(unsigned char *buffer, unsigned long long int bufferSiz
 	return 1;
 }
 
-void getJPEGOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
-	for (unsigned long long int i = 0; i < bufferSize; i++) {
+void getJPEGOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize) {
+	for (uint64_t i = 0; i < bufferSize; i++) {
 		if (buffer[i] == 0xFF && buffer[i+1] == 0xDA) {
 			unsigned short int SOSHeaderSize = 0;
 			memcpy(&SOSHeaderSize, buffer + i + 2, 2);
@@ -25,8 +24,8 @@ void getJPEGOffsets(unsigned char *buffer, unsigned long long int bufferSize, un
 					SOSHeaderSize = ((SOSHeaderSizeBigEndian & 0xff) << 8u) | ((SOSHeaderSizeBigEndian & 0xff00) >> 8u);
 				}
 			}
-			unsigned long long int start = i + SOSHeaderSize + 2;
-			for (unsigned long long int j = start; j < bufferSize; j++) {
+			uint64_t start = i + SOSHeaderSize + 2;
+			for (uint64_t j = start; j < bufferSize; j++) {
 				if (buffer[j] == 0xFF && buffer[j+1] != 0x00)
 					addOffset(offsets, offsetsSize, start, j);
 			}

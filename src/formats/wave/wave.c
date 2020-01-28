@@ -1,8 +1,7 @@
 #include "wave.h"
 #include <stdlib.h>
-#include "../utility.h"
 
-unsigned char detectWAVE(unsigned char *buffer, unsigned long long int bufferSize) {
+uint8_t detectWAVE(uint8_t *buffer, uint64_t bufferSize) {
 	if (buffer[0] != 0x52 ||
 			buffer[1] != 0x49 ||
 			buffer[2] != 0x46 ||
@@ -15,10 +14,10 @@ unsigned char detectWAVE(unsigned char *buffer, unsigned long long int bufferSiz
 	return 1;
 }
 
-void getWAVEOffsets(unsigned char *buffer, unsigned long long int bufferSize, unsigned long long int ***offsets, unsigned long long int *offsetsSize) {
+void getWAVEOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize) {
 	// Find data section
-	unsigned long long int start = 0;
-	for (unsigned long i = 0; i < bufferSize; i++) {
+	uint64_t start = 0;
+	for (uint64_t i = 0; i < bufferSize; i++) {
 		if (buffer[i] == 0x64 && buffer[i+1] == 0x61 && buffer[i+2] == 0x74 && buffer[i+3] == 0x61) {
 			start = i + 8;
 			break;
