@@ -22,7 +22,3 @@ endif (NOT APPLE AND UNIX)
 if (APPLE)
   target_link_libraries(stegano z)
 endif (APPLE)
-
-if (WIN32)
-  target_link_libraries(stegano zlibstat)
-endif (WIN32)
