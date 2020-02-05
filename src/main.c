@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Steganograph!
-		uint8_t status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, outputBuffer, offsets, offsetsSize, activeBits, activeBitsSize);
+		uint8_t status = steganograph(targetBuffer, targetSize, secretBuffer, secretSize, &outputBuffer, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 1)
 			showError("File size mismatch! Secret file can't fit in target with this configuration!");
 		if (status == 2)
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 			uint8_t *secretChunkSize = (uint8_t*)calloc(sizeof(uint64_t), 1);
 			if (!secretChunkSize)
 				showError("Secret chunk size buffer could not be allocated! Make sure enough memory is free on your system.");
-			uint8_t status = desteganograph(targetBuffer, targetSize, secretChunkSize, sizeof(uint64_t), offsets, offsetsSize, activeBits, activeBitsSize);
+			uint8_t status = desteganograph(targetBuffer, targetSize, &secretChunkSize, sizeof(uint64_t), offsets, offsetsSize, activeBits, activeBitsSize);
 			if (status == 2)
 				showError("An unhandled error happened.");
 			memcpy(&secretSize, secretChunkSize, sizeof(uint64_t));
@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
 			showError("Output buffer could not be allocated! Make sure enough memory is free on your system.");
 
 		// Desteganograph!
-		uint8_t status = desteganograph(targetBuffer, targetSize, outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
+		uint8_t status = desteganograph(targetBuffer, targetSize, &outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 2)
 			showError("An unhandled error happened.");
 
