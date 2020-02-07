@@ -23,8 +23,9 @@ uint8_t detectBitmap(uint8_t *buffer, uint64_t bufferSize) {
 
 void getBitmapOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, uint64_t *offsetsSize) {
 	// Extract pixel data start from header
-	uint64_t start;
+	uint32_t start;
 	memcpy(&start, buffer + 0x0A, 4);
+	btol(&start);
 
 	// Get end offset
 	// Get image width and height

@@ -231,6 +231,8 @@ int main(int argc, char *argv[]) {
 			showError("File size mismatch! Secret file can't fit in target with this configuration!");
 		if (status == 2)
 			showError("An unhandled error happened.");
+		if (status == 3)
+			showError("Offsets are bigger than target file size.");
 
 		// Finish off any exceptions
 		endFormatBuffer(&outputBuffer, &targetSize, format, offsets, offsetsSize);

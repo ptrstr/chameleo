@@ -2,10 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-// TODO: Add prevention for impossible scenario where offsets are bigger than the file's size
 // TODO: Add endianess customization
 
 uint8_t steganograph(uint8_t *targetBuffer, uint64_t targetSize, uint8_t *secretBuffer, uint64_t secretSize, uint8_t **outputBuffer, uint64_t **offsets, uint64_t offsetsSize, uByte *activeBits, uint64_t activeBitsSize) {
+	// Check if offsets are in target file size
+	for (uint64_t i = 0; i < offsetsSize; i++)
+		if (offsets[i][0] > targetSize || offsets[i][1] > targetSize)
+			return 3;
+	
 	// Check if secret fits in target
 	uint64_t activeBitsCount = 0;
 	for (uint64_t i = 0; i < activeBitsSize; i++)

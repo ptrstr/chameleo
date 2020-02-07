@@ -39,7 +39,7 @@ void ltob(uint32_t *little) {
 void btol(uint32_t *big) {
 	uByte endianness;
 	endianness.byte = 1;
-	if (endianness.bits.bit1 != 1) {
+	if (endianness.bits.bit0 != 1) {
 		uint32_t little = *big;
 		*big = ((little & 0x000000ff) << 24u) | ((little & 0x0000ff00) << 8u) | ((little & 0x00ff0000) >> 8u) | ((little & 0xff000000) >> 24u);
 	}
