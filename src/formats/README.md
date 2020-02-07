@@ -1,7 +1,7 @@
 # Creating a format
 *Replace where it says $FORMAT by the format ID*
 
-A format needs 3 basic functions:
+A format needs 4 basic functions:
 ```
 // Function called at very beginning to detect if the current file is of the format $FORMAT
 uint8_t detect$FORMAT(uint8_t *buffer, uint64_t bufferSize);
