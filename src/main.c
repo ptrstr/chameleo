@@ -251,6 +251,8 @@ int main(int argc, char *argv[]) {
 			uint8_t status = desteganograph(targetBuffer, targetSize, &secretChunkSize, sizeof(uint64_t), offsets, offsetsSize, activeBits, activeBitsSize);
 			if (status == 2)
 				showError("An unhandled error happened.");
+			if (status == 3)
+				showError("Offsets are bigger than target file size.");
 			memcpy(&secretSize, secretChunkSize, sizeof(uint64_t));
 		}
 
@@ -263,6 +265,8 @@ int main(int argc, char *argv[]) {
 		uint8_t status = desteganograph(targetBuffer, targetSize, &outputBuffer, secretSize, offsets, offsetsSize, activeBits, activeBitsSize);
 		if (status == 2)
 			showError("An unhandled error happened.");
+		if (status == 3)
+			showError("Offsets are bigger than target file size.");
 
 		printf("Successfully desteganographed %" PRId64 " bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
 

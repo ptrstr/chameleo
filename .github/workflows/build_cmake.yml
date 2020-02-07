@@ -11,6 +11,11 @@ jobs:
     - name: Build
       run: |
         ./build.sh
+        
+    - name: Test
+      run: |
+        ./tests.sh ./build/stegano
+        
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
@@ -25,6 +30,10 @@ jobs:
     - name: Build
       run: |
         ./build.sh
+    
+    - name: Test
+      run: |
+        ./tests.sh ./build/stegano
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
@@ -46,6 +55,10 @@ jobs:
         export CC=/usr/bin/x86_64-w64-mingw32-gcc
         ./build.sh
         mv ./build/stegano* ./build/stegano.exe
+    
+    - name: Test
+      run: |
+        ./tests.sh ./build/stegano.exe
     
     - name: Upload Artifact
       uses: actions/upload-artifact@v1

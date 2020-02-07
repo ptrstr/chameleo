@@ -141,7 +141,7 @@ void endPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t **offsets, ui
 
 				// Set new IDAT chunk size
 				uint32_t IDATChunkSize = compressedSize;
-				btol(&IDATChunkSize);
+				ltob(&IDATChunkSize);
 				memcpy((*buffer) + i - 4, &IDATChunkSize, 4);
 
 				// Get pre IDAT buffer

@@ -56,6 +56,11 @@ uint8_t steganograph(uint8_t *targetBuffer, uint64_t targetSize, uint8_t *secret
 }
 
 uint8_t desteganograph(uint8_t *targetBuffer, uint64_t targetSize, uint8_t **secretBuffer, uint64_t secretSize, uint64_t **offsets, uint64_t offsetsSize, uByte *activeBits, uint64_t activeBitsSize) {
+	// Check if offsets are in target file size
+	for (uint64_t i = 0; i < offsetsSize; i++)
+		if (offsets[i][0] > targetSize || offsets[i][1] > targetSize)
+			return 3;
+
 	// Desteganographer starts here
 	uint8_t secretBitIndex = 0;
 	uint64_t secretByteIndex = 0;
