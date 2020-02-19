@@ -4,8 +4,9 @@
 #include <inttypes.h>
 #include "uByte/uByte.h"
 #include "formats/formats.h"
+#include "formats/utility.h"
 #include "steganographer/steganographer.h"
-#define VERSION "0.2.1"
+#define VERSION "0.2.2"
 
 
 #define showError(errorMessage) \
@@ -32,6 +33,9 @@
 			"    -v, --version        Print version information and other information and exit\n" \
 			"    --size-header        Will add a header to the steganographed data indicating the size of the data.\n" \
 			"                         With this argument the -s argument can be suppressed in DECODING\n" \
+			"    --offsets            Use custom offsets. lld must be decimal\n" \
+			"                         Format:  --offsets OFFSETSLEN OFFSETSTART:OFFSETEND\n" \
+			"                         Example: --offsets 2 8:98 132:157\n" \
 			"On errors, the help message or the version information, the program will exit with exit code 1.\n" \
 			"Otherwise it will return 0.\n" \
 			, argv[0]); goto errorfree; }
@@ -67,10 +71,12 @@ int main(int argc, char *argv[]) {
 	FILE *outputFile = NULL;
 	char *outputFileName = NULL;
 
-	uint64_t *(*offsets) = NULL;
+	uint64_t **offsets = NULL;
 	uint64_t offsetsSize = 0;
 
 	uint8_t isUsingHeader = 0;
+	
+	uint8_t isUsingCustomOffsets = 0;
 
 	// Verify Parameters and Assign Them
 	{ // In Scope to prevent access to unnecessary and temporary variables from other places in the function
@@ -120,13 +126,26 @@ int main(int argc, char *argv[]) {
 				showVersion();
 			} else if (strcmp(argv[i], "--size-header") == 0) {
 				isUsingHeader = 1;
+			} else if (strcmp(argv[i], "--offsets") == 0) {
+				isUsingCustomOffsets = 1;
+				uint64_t offsetsToAdd = 0;
+				sscanf(argv[i+1], "%" SCNu64, &offsetsToAdd);
+				for (uint64_t j = 1; j <= offsetsToAdd; j++) {
+					uint64_t startOffset = 0;
+					uint64_t endOffset = 0;
+					sscanf(argv[i+1+j], "%" SCNu64 ":%" SCNu64, &startOffset, &endOffset);
+					addOffset(&offsets, &offsetsSize, startOffset, endOffset);
+				}
 			}
 		}
 
-		if (isUsingHeader && isEncoding == 0) setBit(&mandatoryCheck, 3, 1, 0);
+		if (isUsingHeader && isEncoding == 0)
+			setBit(&mandatoryCheck, 3, 1, 0);
 
 		uint8_t requiredArguments = 4;
-		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1) requiredArguments = 5;
+		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1)
+			requiredArguments = 5;
+		
 		if (countBits(mandatoryCheck) < requiredArguments || isEncoding == 2) {
 			for (uint8_t i = 0; i < requiredArguments; i++) {
 				if (getBit(mandatoryCheck, i, 0) == 0) {
@@ -174,8 +193,11 @@ int main(int argc, char *argv[]) {
 
 	// Get file format
 	FORMAT format = getFormat(targetBuffer, targetSize);
-	if (format == NULLFORMAT)
+	if (format == NULLFORMAT && !isUsingCustomOffsets)
 		showError("The target filetype is unrecognized! See the -v argument to show all current supported formats.");
+	
+	if (isUsingCustomOffsets)
+		format = NULLFORMAT;
 
 	// Get file offsets for steganography
 	getFormatOffsets(targetBuffer, targetSize, format, &offsets, &offsetsSize);
@@ -237,7 +259,7 @@ int main(int argc, char *argv[]) {
 		// Finish off any exceptions
 		endFormatBuffer(&outputBuffer, &targetSize, format, offsets, offsetsSize);
 
-		printf("Successfully steganographed %" PRId64 " bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
+		printf("Successfully steganographed %" PRIu64 " bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
 		for (uint64_t i = 0; i < targetSize; i++)
@@ -245,7 +267,7 @@ int main(int argc, char *argv[]) {
 	} else if (isEncoding == 0) {
 		// Get size from header if present
 		if (isUsingHeader) {
-			uint8_t *secretChunkSize = (uint8_t*)calloc(sizeof(uint64_t), 1);
+			uint8_t *secretChunkSize = (uint8_t*)calloc(1, sizeof(uint64_t));
 			if (!secretChunkSize)
 				showError("Secret chunk size buffer could not be allocated! Make sure enough memory is free on your system.");
 			uint8_t status = desteganograph(targetBuffer, targetSize, &secretChunkSize, sizeof(uint64_t), offsets, offsetsSize, activeBits, activeBitsSize);
@@ -268,7 +290,7 @@ int main(int argc, char *argv[]) {
 		if (status == 3)
 			showError("Offsets are bigger than target file size.");
 
-		printf("Successfully desteganographed %" PRId64 " bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
+		printf("Successfully desteganographed %" PRIu64 " bytes from %s in %s.\n", secretSize, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
 		uint64_t beginningOffset = 0;
@@ -288,7 +310,7 @@ int main(int argc, char *argv[]) {
 	free(outputBuffer);
 	for (uint64_t i = 0; i < offsetsSize; i++)
 		free(offsets[i]);
-	//free(offsets);
+	free(offsets);
 
 	return 0;
 
