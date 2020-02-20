@@ -8,7 +8,7 @@ uint8_t detectBitmap(uint8_t *buffer, uint64_t bufferSize) {
 	// Will only check header
 	unsigned short headerField;
 	memcpy(&headerField, buffer, 2);
-	ltob16(&headerField);
+	btol16(&headerField);
 	if (headerField == 0x424D ||
 			headerField == 0x4241 ||
 			headerField == 0x4349 ||
