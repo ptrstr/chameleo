@@ -27,7 +27,25 @@ void setOffset(uint64_t ***offsets, uint64_t *offsetsSize, uint64_t index, uint6
 		(*offsets)[(*offsetsSize) - 1][index] = newOffset;
 }
 
-void ltob(uint32_t *little) {
+void ltob16(uint16_t *little) {
+	uByte endianness;
+	endianness.byte = 1;
+	if (endianness.bits.bit7 != 1) {
+		uint32_t big = *little;
+		*little = (big>>8) | (big<<8);
+	}
+}
+
+void btol16(uint16_t *big) {
+	uByte endianness;
+	endianness.byte = 1;
+	if (endianness.bits.bit0 != 1) {
+		uint32_t little = *big;
+		*big = (little>>8) | (little<<8);
+	}
+}
+
+void ltob32(uint32_t *little) {
 	uByte endianness;
 	endianness.byte = 1;
 	if (endianness.bits.bit7 != 1) {
@@ -36,7 +54,7 @@ void ltob(uint32_t *little) {
 	}
 }
 
-void btol(uint32_t *big) {
+void btol32(uint32_t *big) {
 	uByte endianness;
 	endianness.byte = 1;
 	if (endianness.bits.bit0 != 1) {

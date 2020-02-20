@@ -21,7 +21,7 @@ void getPNGOffsets(uint8_t *buffer, uint64_t bufferSize, uint64_t ***offsets, ui
 		if (buffer[i] == 'I' && buffer[i+1] == 'D' && buffer[i+2] == 'A' && buffer[i+3] == 'T') {
 			uint32_t IDATChunkSize = 0;
 			memcpy(&IDATChunkSize, buffer + i - 4, 4);
-			ltob(&IDATChunkSize);
+			ltob32(&IDATChunkSize);
 			addOffset(offsets, offsetsSize, i + 4, i + 4 + IDATChunkSize);
 		}
 	}
@@ -37,9 +37,9 @@ void startPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t ***offsets,
 	for (uint64_t i = 0; i < (*bufferSize); i++) {
 		if ((*buffer)[i] == 'I' && (*buffer)[i+1] == 'H' && (*buffer)[i+2] == 'D' && (*buffer)[i+3] == 'R') {
 			memcpy(&width, (*buffer) + i + 4, 4);
-			ltob(&width);
+			ltob32(&width);
 			memcpy(&height, (*buffer) + i + 8, 4);
-			ltob(&height);
+			ltob32(&height);
 			memcpy(&bitDepth, (*buffer) + i + 12, 1);
 			memcpy(&colorType, (*buffer) + i + 13, 1);
 			memcpy(&compressionType, (*buffer) + i + 14, 1);
@@ -120,7 +120,7 @@ void endPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t **offsets, ui
 			if (IDATChunkCounter > 0) {
 				uint32_t IDATChunkSize = 0;
 				memcpy(&IDATChunkSize, (*buffer) + i - 4, 4);
-				ltob(&IDATChunkSize);
+				ltob32(&IDATChunkSize);
 				uint8_t *preChunkBuffer = (uint8_t*)calloc(i - 4, 1);
 				if (!preChunkBuffer)
 					return;
@@ -137,11 +137,11 @@ void endPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t **offsets, ui
 				// Get original IDAT chunk size
 				uint32_t origIDATChunkSize = 0;
 				memcpy(&origIDATChunkSize, (*buffer) + i - 4, 4);
-				ltob(&origIDATChunkSize);
+				ltob32(&origIDATChunkSize);
 
 				// Set new IDAT chunk size
 				uint32_t IDATChunkSize = compressedSize;
-				ltob(&IDATChunkSize);
+				ltob32(&IDATChunkSize);
 				memcpy((*buffer) + i - 4, &IDATChunkSize, 4);
 
 				// Get pre IDAT buffer
@@ -169,7 +169,7 @@ void endPNGBuffer(uint8_t **buffer, uint64_t *bufferSize, uint64_t **offsets, ui
 
 				// Add Hash
 				uint32_t hash = crc32(0, (*buffer) + i, compressedSize + 4);
-				ltob(&hash);
+				ltob32(&hash);
 				memcpy((*buffer) + i + 4 + compressedSize, &hash, 4);
 			}
 			IDATChunkCounter++;

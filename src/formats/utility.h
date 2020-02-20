@@ -5,5 +5,7 @@ void addOffset(uint64_t ***offsets, uint64_t *offsetsSize, uint64_t start, uint6
 
 void setOffset(uint64_t ***offsets, uint64_t *offsetsSize, uint64_t index, uint64_t newOffset);
 
-void ltob(uint32_t *little);
-void btol(uint32_t *big);
+void ltob16(uint16_t *little);
+void btol16(uint16_t *btol);
+void ltob32(uint32_t *little);
+void btol32(uint32_t *big);
