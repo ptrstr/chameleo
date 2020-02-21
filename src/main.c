@@ -262,8 +262,7 @@ int main(int argc, char *argv[]) {
 		printf("Successfully steganographed %" PRIu64 " bytes from %s in %s inside %s.\n", secretSize, secretFileName, targetFileName, outputFileName);
 
 		// Do this to cancel any \0 errors
-		for (uint64_t i = 0; i < targetSize; i++)
-			fputc(outputBuffer[i], outputFile);
+		fwrite(outputBuffer, 1, targetSize, outputFile);
 	} else if (isEncoding == 0) {
 		// Get size from header if present
 		if (isUsingHeader) {
@@ -296,8 +295,7 @@ int main(int argc, char *argv[]) {
 		uint64_t beginningOffset = 0;
 		if (isUsingHeader)
 			beginningOffset = sizeof(uint64_t);
-		for (uint64_t i = beginningOffset; i < secretSize; i++)
-			fputc(outputBuffer[i], outputFile);
+		fwrite(outputBuffer + beginningOffset, 1, secretSize - beginningOffset, outputFile);
 	} else {
 		showError("[visible confusion]");
 	}
