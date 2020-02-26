@@ -5,36 +5,36 @@ on: [push]
 jobs:
   build-Linux-x86_64:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
     - name: Build
       run: |
         ./build.sh
-        
+
     - name: Test
       run: |
         ./tests.sh ./build/stegano
-        
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
         name: Linux-x86_64
         path: ./build/stegano
-        
+
   build-MacOS-x86_64:
     runs-on: macos-latest
-    
+
     steps:
     - uses: actions/checkout@v1
     - name: Build
       run: |
         ./build.sh
-    
+
     - name: Test
       run: |
         ./tests.sh ./build/stegano
-    
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
@@ -43,25 +43,36 @@ jobs:
 
   build-MinGW-x86_64:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v1
     - name: Configure
       run: |
         sudo apt install mingw-w64 libz-mingw-w64-dev
-      
+
     - name: Build
       run: |
         export CC=/usr/bin/x86_64-w64-mingw32-gcc
         ./build.sh
         mv ./build/stegano* ./build/stegano.exe
-    
-    - name: Test
-      run: |
-        ./tests.sh ./build/stegano.exe
-    
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
         name: MinGW-x86_64
         path: ./build/stegano.exe
+
+  test-MinGW-x86_64:
+    runs-on: windows-latest
+    needs: [build-MinGW-x86_64]
+
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/download-artifact@v1
+      with:
+        name: MinGW-x86_64
+
+    - name: Test
+      shell: bash
+      run: |
+        ./tests.sh ./MinGW-x86_64/stegano.exe

@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 	uint64_t offsetsSize = 0;
 
 	uint8_t isUsingHeader = 0;
-	
+
 	uint8_t isUsingCustomOffsets = 0;
 
 	// Verify Parameters and Assign Them
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 		uint8_t requiredArguments = 4;
 		if (getBit(mandatoryCheck, 1, 0) == 1 && isEncoding == 1)
 			requiredArguments = 5;
-		
+
 		if (countBits(mandatoryCheck) < requiredArguments || isEncoding == 2) {
 			for (uint8_t i = 0; i < requiredArguments; i++) {
 				if (getBit(mandatoryCheck, i, 0) == 0) {
@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 	FORMAT format = getFormat(targetBuffer, targetSize);
 	if (format == NULLFORMAT && !isUsingCustomOffsets)
 		showError("The target filetype is unrecognized! See the -v argument to show all current supported formats.");
-	
+
 	if (isUsingCustomOffsets)
 		format = NULLFORMAT;
 
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
 	// Prepare buffer for exceptions
 	startFormatBuffer(&targetBuffer, &targetSize, format, &offsets, &offsetsSize);
 
-	outputFile = fopen(outputFileName, "w");
+	outputFile = fopen(outputFileName, "wb");
 	if (!outputFile)
 		showError("Output file could not be opened for writing! Make sure you have permissions.");
 
