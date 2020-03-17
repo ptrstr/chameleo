@@ -42,3 +42,7 @@ You will need to add the $FORMAT to the FORMAT enum in formats.h
 ### formats/formats.c
 
 You will need to add calls to the functions created by $FORMAT in their respective parent callers.
+
+### main.c
+
+You will need to add the format in the list of supported file formats (in the showVersion() macro).
