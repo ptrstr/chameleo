@@ -41,7 +41,7 @@
 			, argv[0]); goto errorfree; }
 #define showVersion() \
 	{ printf("" \
-			"stegano " VERSION "\n" \
+			"chameleo " VERSION "\n" \
 			"Copyright (C) 2020 ptrstr.\n" \
 			"This program uses zlib for the PNG (de)compression.\n" \
 			"\nSupported Formats:\n" \

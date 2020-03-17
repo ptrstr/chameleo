@@ -14,13 +14,13 @@ jobs:
 
     - name: Test
       run: |
-        ./tests.sh ./build/stegano
+        ./tests.sh ./build/chameleo
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
         name: Linux-x86_64
-        path: ./build/stegano
+        path: ./build/chameleo
 
   build-MacOS-x86_64:
     runs-on: macos-latest
@@ -33,13 +33,13 @@ jobs:
 
     - name: Test
       run: |
-        ./tests.sh ./build/stegano
+        ./tests.sh ./build/chameleo
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
         name: MacOS-x86_64
-        path: ./build/stegano
+        path: ./build/chameleo
 
   build-MinGW-x86_64:
     runs-on: ubuntu-latest
@@ -54,13 +54,13 @@ jobs:
       run: |
         export CC=/usr/bin/x86_64-w64-mingw32-gcc
         ./build.sh
-        mv ./build/stegano* ./build/stegano.exe
+        mv ./build/chameleo* ./build/chameleo.exe
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v1
       with:
         name: MinGW-x86_64
-        path: ./build/stegano.exe
+        path: ./build/chameleo.exe
 
   test-MinGW-x86_64:
     runs-on: windows-latest
@@ -75,4 +75,4 @@ jobs:
     - name: Test
       shell: bash
       run: |
-        ./tests.sh ./MinGW-x86_64/stegano.exe
+        ./tests.sh ./MinGW-x86_64/chameleo.exe

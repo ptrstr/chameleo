@@ -4,5 +4,5 @@ cd $DIR
 
 git add .
 git commit -m "${1}"
-git remote add origin https://github.com/ptrstr/stegano.git
+git remote add origin https://github.com/ptrstr/chameleo.git
 git push origin master
