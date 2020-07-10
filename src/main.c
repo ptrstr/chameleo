@@ -10,7 +10,7 @@
 
 
 #define showError(errorMessage) \
-	{ fprintf(stderr, "Error: " errorMessage "\n"); goto errorfree; }
+	{ fputs(stderr, "Error: " errorMessage "\n"); goto errorfree; }
 #define showHelp() \
 	{ printf("" \
 			"Usage: %s [OPTIONS]\n" \
@@ -40,7 +40,7 @@
 			"Otherwise it will return 0.\n" \
 			, argv[0]); goto errorfree; }
 #define showVersion() \
-	{ printf("" \
+	{ puts("" \
 			"chameleo " VERSION "\n" \
 			"Copyright (C) 2020 ptrstr.\n" \
 			"This program uses zlib for the PNG (de)compression.\n" \
